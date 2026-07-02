@@ -7,7 +7,7 @@ import Breakdown from './pages/Breakdown';
 
 function App() {
   return (
-    <Router basename="/orbit">
+    <Router basename="/Orbit">
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
