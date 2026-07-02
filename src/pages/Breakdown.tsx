@@ -1,4 +1,4 @@
-import { BookOpen, Shield, Code, Server, Network } from 'lucide-react';
+import { Shield, Code, Server, Network } from 'lucide-react';
 
 export default function Breakdown() {
   return (
