@@ -6,7 +6,7 @@ import Vault from './pages/Vault';
 
 function App() {
   return (
-    <Router>
+    <Router basename="/subscriptionIQ">
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
