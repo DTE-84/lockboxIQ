@@ -1,5 +1,5 @@
 :root {
-  /* Lux Vault - Gold/Obsidian Theme */
+  /* Lux Forest - Kinetic Green/Obsidian Theme */
   --bg-base: #0B0F12;      /* Obsidian/Deepest charcoal */
   --bg-surface: #131A1F;   /* Lifted charcoal */
   --bg-surface-hover: #1A2228;
@@ -7,15 +7,15 @@
   
   --border-subtle: rgba(255, 255, 255, 0.06);
   --border-strong: rgba(255, 255, 255, 0.12);
-  --border-gold: rgba(212, 175, 55, 0.3);
+  --border-gold: rgba(0, 230, 118, 0.3);
   
   --text-primary: #FFFFFF;
   --text-secondary: #9BA3A9;
   --text-tertiary: #67717A;
   
-  --primary: #D4AF37;      /* Lux Gold */
-  --primary-hover: #E5C355;
-  --primary-transparent: rgba(212, 175, 55, 0.15);
+  --primary: #00E676;      /* Kinetic Green */
+  --primary-hover: #10B981;
+  --primary-transparent: rgba(0, 230, 118, 0.15);
   
   --danger: #E05252;
   --danger-transparent: rgba(224, 82, 82, 0.15);

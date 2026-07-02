@@ -1,13 +1,14 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Shield, LayoutDashboard, CreditCard, LogOut, Settings } from 'lucide-react';
+import { Shield, LayoutDashboard, CreditCard, LogOut, Settings, BookOpen } from 'lucide-react';
 
 const Sidebar = () => {
   const location = useLocation();
 
   const navItems = [
-    { path: '/', icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
-    { path: '/subscriptions', icon: <CreditCard size={20} />, label: 'Subscriptions' },
-    { path: '/vault', icon: <Shield size={20} />, label: 'Lockbox Vault' },
+    { path: '/', icon: <LayoutDashboard size={20} /> , label: 'Dashboard' },
+    { path: '/subscriptions', icon: <CreditCard size={20} /> , label: 'Subscriptions' },
+    { path: '/vault', icon: <Shield size={20} /> , label: 'Lockbox Vault' },
+    { path: '/breakdown', icon: <BookOpen size={20} /> , label: 'Architecture' },
   ];
 
   return (
