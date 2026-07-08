@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS public.orbit_subscriptions (
     status TEXT DEFAULT 'Active',
     payment_method TEXT,
     logo_emoji TEXT,
+    cancel_url TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 

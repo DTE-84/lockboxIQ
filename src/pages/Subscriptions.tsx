@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Plus, Search, Filter, MoreVertical, CreditCard, Edit, PauseCircle, Trash2, Loader2 } from 'lucide-react';
+import { Plus, Search, Filter, MoreVertical, CreditCard, Edit, PauseCircle, Trash2, Loader2, ExternalLink } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import SubscriptionModal from '../components/SubscriptionModal';
 
@@ -139,6 +139,11 @@ export default function Subscriptions() {
                           <button className="dropdown-item">
                             <PauseCircle size={14} /> Pause
                           </button>
+                          {sub.cancel_url && (
+                            <button className="dropdown-item" onClick={() => window.open(sub.cancel_url, '_blank')}>
+                              <ExternalLink size={14} /> Cancel Service
+                            </button>
+                          )}
                           <button className="dropdown-item danger">
                             <Trash2 size={14} /> Delete
                           </button>

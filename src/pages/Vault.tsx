@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Plus, Shield, Lock, Eye, EyeOff, Copy, ExternalLink, Check, MoreVertical, Edit, Trash2, Loader2 } from 'lucide-react';
+import { Plus, Shield, Lock, Eye, EyeOff, Copy, ExternalLink, Check, MoreVertical, Edit, Trash2, Loader2, AlertTriangle, Users } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import CredentialModal from '../components/CredentialModal';
+import { decryptAES } from '../lib/crypto';
 
 export default function Vault() {
   const [copiedId, setCopiedId] = useState<number | null>(null);
@@ -9,7 +11,9 @@ export default function Vault() {
   const [pinPromptFor, setPinPromptFor] = useState<number | null>(null);
   const [pin, setPin] = useState('');
   const [credentials, setCredentials] = useState<any[]>([]);
+  const [decryptedPasswords, setDecryptedPasswords] = useState<Record<number, string>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = () => setActiveDropdown(null);
@@ -39,7 +43,14 @@ export default function Vault() {
   const handleCopy = (id: number, type: 'password' | 'username') => {
     const cred = credentials.find(c => c.id === id);
     if (cred) {
-      const textToCopy = type === 'password' ? cred.encrypted_password : cred.username;
+      // If password, it must be decrypted first
+      const textToCopy = type === 'password' ? (decryptedPasswords[id] || 'ENCRYPTED') : cred.username;
+      
+      if (textToCopy === 'ENCRYPTED') {
+        alert("Please unlock the password first before copying.");
+        return;
+      }
+      
       navigator.clipboard.writeText(textToCopy).then(() => {
         setCopiedId(id);
         setTimeout(() => setCopiedId(null), 2000);
@@ -57,9 +68,17 @@ export default function Vault() {
   };
 
   const submitPin = () => {
-    if (pin.length >= 4) { // Dummy validation
-      setRevealedId(pinPromptFor);
-      setPinPromptFor(null);
+    const cred = credentials.find(c => c.id === pinPromptFor);
+    if (cred && pin.length >= 4) {
+      const decrypted = decryptAES(cred.encrypted_password, pin);
+      
+      if (decrypted) {
+        setDecryptedPasswords(prev => ({ ...prev, [cred.id]: decrypted }));
+        setRevealedId(pinPromptFor);
+        setPinPromptFor(null);
+      } else {
+        alert("Decryption failed. Incorrect Master PIN.");
+      }
     }
   };
 
@@ -70,10 +89,16 @@ export default function Vault() {
           <h1 style={{ fontSize: '2rem', marginBottom: '8px' }}>Security Vault</h1>
           <p className="text-secondary">AES-256 Client-side Encrypted Credentials.</p>
         </div>
-        <button className="btn btn-primary">
-          <Plus size={18} />
-          New Credential
-        </button>
+        <div className="flex-center" style={{ gap: '12px' }}>
+          <button className="btn btn-secondary">
+            <Users size={18} />
+            Share Vault
+          </button>
+          <button className="btn btn-primary" onClick={() => setIsAddModalOpen(true)}>
+            <Plus size={18} />
+            New Credential
+          </button>
+        </div>
       </div>
 
       <div className="glass-panel delay-1 mb-4" style={{ backgroundColor: 'var(--primary-transparent)', border: '1px solid var(--border-gold)' }}>
@@ -138,10 +163,18 @@ export default function Vault() {
                 </div>
                 
                 <div>
-                  <span className="text-secondary" style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>Password</span>
+                  <div className="flex-between">
+                    <span className="text-secondary" style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>Password</span>
+                    {/* Mock Compromised Password UI Badge for the pitch */}
+                    {cred.id === credentials[0]?.id && (
+                      <span style={{ fontSize: '0.7rem', padding: '2px 8px', backgroundColor: 'rgba(255, 69, 58, 0.1)', color: 'var(--danger)', borderRadius: '12px', border: '1px solid rgba(255, 69, 58, 0.3)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <AlertTriangle size={10} /> Payment Risk Detected
+                      </span>
+                    )}
+                  </div>
                   <div className="flex-between mt-1">
                     <span style={{ fontSize: '0.95rem', fontFamily: 'monospace', color: revealedId === cred.id ? 'var(--text-primary)' : 'var(--text-tertiary)', letterSpacing: revealedId === cred.id ? 'normal' : '2px' }}>
-                      {revealedId === cred.id ? cred.encrypted_password : '••••••••••••••••'}
+                      {revealedId === cred.id ? decryptedPasswords[cred.id] : '••••••••••••••••'}
                     </span>
                     <div className="flex-center" style={{ gap: '8px' }}>
                       <button className="btn-icon" style={{ padding: '4px' }} onClick={() => toggleReveal(cred.id)}>
@@ -181,12 +214,18 @@ export default function Vault() {
           </div>
           <h3 style={{ marginBottom: '8px' }}>Vault is Empty</h3>
           <p className="text-secondary" style={{ marginBottom: '24px', maxWidth: '400px', margin: '0 auto 24px' }}>Your zero-knowledge vault is ready. Add your first credential to secure it with client-side AES-256 encryption.</p>
-          <button className="btn btn-primary">
+          <button className="btn btn-primary" onClick={() => setIsAddModalOpen(true)}>
             <Plus size={18} />
             New Credential
           </button>
         </div>
       )}
+      
+      <CredentialModal 
+        isOpen={isAddModalOpen} 
+        onClose={() => setIsAddModalOpen(false)} 
+        onSuccess={fetchCredentials} 
+      />
     </div>
   );
 }

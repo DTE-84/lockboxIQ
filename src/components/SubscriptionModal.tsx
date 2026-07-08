@@ -10,14 +10,28 @@ interface SubscriptionModalProps {
 }
 
 const PREDEFINED_SERVICES = [
-  { name: 'Netflix', category: 'Entertainment', logo_emoji: '🍿', defaultCost: 22.99 },
-  { name: 'Max (HBO)', category: 'Entertainment', logo_emoji: '🟣', defaultCost: 15.99 },
-  { name: 'Peacock', category: 'Entertainment', logo_emoji: '🦚', defaultCost: 5.99 },
-  { name: 'AT&T', category: 'Utilities', logo_emoji: '📱', defaultCost: 85.00 },
-  { name: 'T-Mobile', category: 'Utilities', logo_emoji: '📡', defaultCost: 70.00 },
-  { name: 'Spotify', category: 'Music', logo_emoji: '🎧', defaultCost: 10.99 },
-  { name: 'Apple Music', category: 'Music', logo_emoji: '🎵', defaultCost: 10.99 },
-  { name: 'Custom', category: 'Other', logo_emoji: '📦', defaultCost: 0.00 },
+  // Lifestyle & Gear
+  { name: 'Bespoke Post', category: 'Lifestyle & Gear', logo_emoji: '🏕️', defaultCost: 49.00, cancel_url: 'https://www.bespokepost.com/account/settings' },
+  { name: 'FabFitFun', category: 'Lifestyle & Gear', logo_emoji: '✨', defaultCost: 59.99, cancel_url: 'https://fabfitfun.com/my-account/' },
+  { name: 'Breo Box', category: 'Lifestyle & Gear', logo_emoji: '🔌', defaultCost: 159.00, cancel_url: 'https://www.breobox.com/account' },
+  // Clothing & Styling
+  { name: 'Stitch Fix', category: 'Clothing', logo_emoji: '👕', defaultCost: 20.00, cancel_url: 'https://www.stitchfix.com/my-account/settings' },
+  { name: 'Rent the Runway', category: 'Clothing', logo_emoji: '👗', defaultCost: 94.00, cancel_url: 'https://www.renttherunway.com/account/membership' },
+  // Food & Gourmet
+  { name: 'HelloFresh', category: 'Food & Drink', logo_emoji: '🥦', defaultCost: 69.00, cancel_url: 'https://www.hellofresh.com/settings/plan' },
+  { name: 'Goldbelly', category: 'Food & Drink', logo_emoji: '🍕', defaultCost: 79.00, cancel_url: 'https://www.goldbelly.com/account' },
+  { name: 'Trade Coffee', category: 'Food & Drink', logo_emoji: '☕', defaultCost: 19.50, cancel_url: 'https://www.drinktrade.com/account/subscriptions' },
+  // Self-Care, Beauty & Books
+  { name: 'IPSY', category: 'Self-Care & Beauty', logo_emoji: '💄', defaultCost: 14.00, cancel_url: 'https://www.ipsy.com/account/membership' },
+  { name: 'TheraBox', category: 'Self-Care & Beauty', logo_emoji: '🧘', defaultCost: 39.99, cancel_url: 'https://mytherabox.com/account' },
+  { name: 'Book of the Month', category: 'Books', logo_emoji: '📚', defaultCost: 17.99, cancel_url: 'https://www.bookofthemonth.com/account' },
+  // Entertainment & Utilities (Originals)
+  { name: 'Netflix', category: 'Entertainment', logo_emoji: '🍿', defaultCost: 22.99, cancel_url: 'https://www.netflix.com/YourAccount' },
+  { name: 'Max (HBO)', category: 'Entertainment', logo_emoji: '🟣', defaultCost: 15.99, cancel_url: 'https://auth.max.com/account' },
+  { name: 'Peacock', category: 'Entertainment', logo_emoji: '🦚', defaultCost: 5.99, cancel_url: 'https://www.peacocktv.com/account' },
+  { name: 'Spotify', category: 'Music', logo_emoji: '🎧', defaultCost: 10.99, cancel_url: 'https://www.spotify.com/us/account/overview/' },
+  { name: 'Apple Music', category: 'Music', logo_emoji: '🎵', defaultCost: 10.99, cancel_url: 'https://music.apple.com/account' },
+  { name: 'Custom', category: 'Other', logo_emoji: '📦', defaultCost: 0.00, cancel_url: '' },
 ];
 
 export default function SubscriptionModal({ isOpen, onClose, onSuccess }: SubscriptionModalProps) {
@@ -29,7 +43,8 @@ export default function SubscriptionModal({ isOpen, onClose, onSuccess }: Subscr
     cost: '',
     billing_cycle: 'Monthly',
     payment_method: '',
-    logo_emoji: '📦'
+    logo_emoji: '📦',
+    cancel_url: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -43,7 +58,8 @@ export default function SubscriptionModal({ isOpen, onClose, onSuccess }: Subscr
       cost: service.defaultCost > 0 ? service.defaultCost.toString() : '',
       billing_cycle: 'Monthly',
       payment_method: '',
-      logo_emoji: service.logo_emoji
+      logo_emoji: service.logo_emoji,
+      cancel_url: service.cancel_url || ''
     });
   };
 
@@ -65,7 +81,8 @@ export default function SubscriptionModal({ isOpen, onClose, onSuccess }: Subscr
           billing_cycle: formData.billing_cycle,
           status: 'Active',
           payment_method: formData.payment_method || 'Credit Card',
-          logo_emoji: formData.logo_emoji
+          logo_emoji: formData.logo_emoji,
+          cancel_url: formData.cancel_url || ''
         }]);
 
       if (error) throw error;
@@ -169,12 +186,21 @@ export default function SubscriptionModal({ isOpen, onClose, onSuccess }: Subscr
                   </div>
                 </div>
 
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px' }}>Payment Method (Optional)</label>
-                  <input 
-                    type="text" placeholder="e.g. Visa ending in 4242" value={formData.payment_method} onChange={e => setFormData({...formData, payment_method: e.target.value})}
-                    style={{ width: '100%', padding: '10px 12px', backgroundColor: 'var(--bg-base)', border: '1px solid var(--border-subtle)', borderRadius: '8px', color: 'var(--text-primary)', outline: 'none' }}
-                  />
+                <div style={{ display: 'flex', gap: '16px' }}>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px' }}>Payment Method (Optional)</label>
+                    <input 
+                      type="text" placeholder="e.g. Visa ending in 4242" value={formData.payment_method} onChange={e => setFormData({...formData, payment_method: e.target.value})}
+                      style={{ width: '100%', padding: '10px 12px', backgroundColor: 'var(--bg-base)', border: '1px solid var(--border-subtle)', borderRadius: '8px', color: 'var(--text-primary)', outline: 'none' }}
+                    />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '8px' }}>Cancellation URL (Optional)</label>
+                    <input 
+                      type="url" placeholder="https://" value={formData.cancel_url} onChange={e => setFormData({...formData, cancel_url: e.target.value})}
+                      style={{ width: '100%', padding: '10px 12px', backgroundColor: 'var(--bg-base)', border: '1px solid var(--border-subtle)', borderRadius: '8px', color: 'var(--text-primary)', outline: 'none' }}
+                    />
+                  </div>
                 </div>
               </div>
 
