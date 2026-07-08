@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { Plus, Search, Filter, MoreVertical, CreditCard, Edit, PauseCircle, Trash2, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import SubscriptionModal from '../components/SubscriptionModal';
 
 export default function Subscriptions() {
   const [search, setSearch] = useState('');
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -43,7 +45,7 @@ export default function Subscriptions() {
           <h1 style={{ fontSize: '2rem', marginBottom: '8px' }}>Active Subscriptions</h1>
           <p className="text-secondary">Manage your recurring billing and service providers.</p>
         </div>
-        <button className="btn btn-primary">
+        <button className="btn btn-primary" onClick={() => setIsAddModalOpen(true)}>
           <Plus size={18} />
           Add Subscription
         </button>
@@ -155,7 +157,7 @@ export default function Subscriptions() {
             </div>
             <h3 style={{ marginBottom: '8px' }}>No Subscriptions Found</h3>
             <p className="text-secondary" style={{ marginBottom: '24px', maxWidth: '400px', margin: '0 auto 24px' }}>You aren't tracking any subscriptions yet. Add your first service to start monitoring your recurring spend.</p>
-            <button className="btn btn-primary">
+            <button className="btn btn-primary" onClick={() => setIsAddModalOpen(true)}>
               <Plus size={18} />
               Add Subscription
             </button>
@@ -165,6 +167,12 @@ export default function Subscriptions() {
           .hover-row:hover { background-color: var(--bg-surface-hover) !important; cursor: pointer; }
         `}</style>
       </div>
+      
+      <SubscriptionModal 
+        isOpen={isAddModalOpen} 
+        onClose={() => setIsAddModalOpen(false)} 
+        onSuccess={fetchSubscriptions} 
+      />
     </div>
   );
 }
